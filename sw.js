@@ -1,4 +1,4 @@
-const CACHE = 'score-tracker-v1';
+const CACHE = 'score-tracker-v2';
 const FILES = ['./score-tracker.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
