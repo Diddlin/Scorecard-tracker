@@ -260,6 +260,35 @@
 
         .clear-btn-wrap { padding: 8px 0 20px; }
 
+        /* ── Halftime roast modal ── */
+        .halfway-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.88);
+            z-index: 998;
+            display: flex; align-items: center; justify-content: center;
+            padding: 24px;
+        }
+        .halfway-modal.hidden { display: none; }
+        .halfway-card {
+            background: var(--surface);
+            border: 2px solid var(--surface2);
+            border-radius: 20px;
+            padding: 28px 22px;
+            text-align: center;
+            width: 100%;
+            max-width: 420px;
+        }
+        .halfway-icon { font-size: 52px; margin-bottom: 10px; }
+        .halfway-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--text-dim); margin-bottom: 14px;
+        }
+        .halfway-msg {
+            font-size: 17px; font-weight: 600; line-height: 1.55;
+            color: var(--text); margin-bottom: 22px;
+        }
+        .halfway-msg .roast-name { color: var(--warning); }
+
         /* ── Matrix transition ── */
         #matrix-canvas {
             position: fixed;
@@ -379,6 +408,14 @@
     <div class="clear-btn-wrap" id="hist-clear-wrap"></div>
 </div>
 
+<div id="halfway-modal" class="halfway-modal hidden">
+    <div class="halfway-card">
+        <div class="halfway-icon">😬</div>
+        <div class="halfway-label">Halftime Report</div>
+        <div class="halfway-msg" id="halfway-msg"></div>
+        <button class="btn btn-primary" onclick="dismissHalfway()">Thanks, I needed that</button>
+    </div>
+</div>
 <canvas id="matrix-canvas"></canvas>
 <div class="toast" id="toast"></div>
 
@@ -577,10 +614,37 @@ function nineSet(pi, field, val, focusId) {
     renderNine(focusId);
 }
 
+const ROASTS = [
+    "Halfway done, <b>{name}</b>. Your score is… a choice.",
+    "<b>{name}</b> is playing a long game. A very, very long game.",
+    "Scientists are baffled by <b>{name}</b>'s unique scoring strategy.",
+    "Bold of <b>{name}</b> to save all their points for the second half.",
+    "<b>{name}</b>: proving that participation is, in fact, its own reward.",
+    "The good news, <b>{name}</b>: mathematically, a comeback is still theoretically possible.",
+    "<b>{name}</b> would like everyone to know they're 'just warming up.'",
+    "In a surprising twist, <b>{name}</b> has found a way to make losing look effortless.",
+    "<b>{name}</b>'s score so far is being studied by researchers as a statistical anomaly.",
+    "Don't worry, <b>{name}</b> — the second half is where legends are made. No pressure.",
+];
+
+let halfwayCallback = null;
+
 function nineNav(dir) {
     if (dir === -1) {
         S.nineCur = Math.max(0, S.nineCur - 1);
         renderNine();
+        return;
+    }
+    // Halfway point: after the first 1-card round (index 8), before the second (index 9)
+    if (S.nineCur === 8) {
+        const totals = nineTotals();
+        const minScore = Math.min(...totals);
+        const lastIdx = totals.indexOf(minScore);
+        const lastName = S.players[lastIdx];
+        const roast = ROASTS[Math.floor(Math.random() * ROASTS.length)].replace('{name}', lastName);
+        document.getElementById('halfway-msg').innerHTML = roast;
+        document.getElementById('halfway-modal').classList.remove('hidden');
+        halfwayCallback = () => matrixTransition(() => { S.nineCur++; renderNine(); });
         return;
     }
     if (S.nineCur === NINE_SEQ.length - 1) {
@@ -588,6 +652,11 @@ function nineNav(dir) {
     } else {
         matrixTransition(() => { S.nineCur++; renderNine(); });
     }
+}
+
+function dismissHalfway() {
+    document.getElementById('halfway-modal').classList.add('hidden');
+    if (halfwayCallback) { halfwayCallback(); halfwayCallback = null; }
 }
 
 function matrixTransition(callback) {
