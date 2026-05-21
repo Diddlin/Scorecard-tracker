@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Card Score Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#111827">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Score Tracker">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #111827;
+            --surface: #1f2937;
+            --surface2: #374151;
+            --primary: #059669;
+            --primary-light: #10b981;
+            --accent: #34d399;
+            --text: #f9fafb;
+            --text-dim: #9ca3af;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .screen { display: none; padding: 20px; min-height: 100vh; }
+        .screen.active { display: block; }
+
+        /* ── Home ── */
+        .home-hero {
+            text-align: center;
+            padding: 48px 0 36px;
+        }
+        .home-hero h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+        .home-hero p { color: var(--text-dim); font-size: 14px; }
+
+        .game-list { display: flex; flex-direction: column; gap: 14px; }
+        .game-card {
+            background: var(--surface);
+            border: 2px solid var(--surface2);
+            border-radius: 18px;
+            padding: 22px 20px;
+            cursor: pointer;
+            transition: border-color 0.15s, transform 0.1s;
+        }
+        .game-card:active { transform: scale(0.97); border-color: var(--primary-light); }
+        .game-card h2 { font-size: 20px; font-weight: 700; color: var(--accent); margin-bottom: 5px; }
+        .game-card p { font-size: 13px; color: var(--text-dim); line-height: 1.4; }
+
+        /* ── Setup ── */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .page-header h2 { font-size: 18px; font-weight: 700; color: var(--accent); }
+        .back-btn {
+            background: var(--surface2);
+            border: none;
+            color: var(--text-dim);
+            font-size: 18px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .hint { font-size: 13px; color: var(--text-dim); text-align: center; margin-bottom: 18px; }
+
+        .player-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+        .player-row { display: flex; align-items: center; gap: 10px; }
+        .player-badge {
+            width: 30px; height: 30px;
+            background: var(--surface2);
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-dim);
+            flex-shrink: 0;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 14px;
+            background: var(--surface);
+            border: 2px solid var(--surface2);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 16px;
+            outline: none;
+        }
+        input[type="text"]:focus { border-color: var(--primary-light); }
+
+        .game-input {
+            width: 100%;
+            padding: 9px 4px;
+            background: var(--surface2);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 17px;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+        }
+        .game-input:focus { border-color: var(--primary-light); background: var(--surface); }
+
+        /* Bid warning banner */
+        .bid-warning {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #7f1d1d;
+            border: 1px solid var(--danger);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fca5a5;
+        }
+        .bid-warning.hidden { display: none; }
+
+        /* ── Buttons ── */
+        .btn {
+            display: block; width: 100%;
+            padding: 14px; border: none;
+            border-radius: 12px;
+            font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: transform 0.1s, opacity 0.1s;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary-light); color: #fff; }
+        .btn-secondary { background: var(--surface2); color: var(--text); }
+        .btn-warn { background: var(--warning); color: #111; }
+        .btn-sm {
+            display: inline-block; width: auto;
+            padding: 7px 14px; font-size: 13px; border-radius: 8px;
+        }
+
+        /* ── 9 Up 9 Down game screen ── */
+        .game-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .game-top-bar .game-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .round-card {
+            background: var(--surface);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+        .round-card .sub { font-size: 12px; color: var(--text-dim); margin-bottom: 2px; }
+        .round-card .big { font-size: 36px; font-weight: 800; color: var(--accent); line-height: 1; }
+        .round-card .label { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+        .round-dots {
+            display: flex; justify-content: center; gap: 5px; margin-top: 10px; flex-wrap: wrap;
+        }
+        .round-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--surface2);
+            transition: background 0.2s;
+        }
+        .round-dot.done { background: var(--primary); }
+        .round-dot.current { background: var(--accent); transform: scale(1.3); }
+
+        /* Totals chips */
+        .totals-row {
+            display: flex; gap: 8px; overflow-x: auto;
+            padding-bottom: 4px; margin-bottom: 14px;
+            scrollbar-width: none;
+        }
+        .totals-row::-webkit-scrollbar { display: none; }
+        .total-chip {
+            flex-shrink: 0;
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 8px 12px;
+            text-align: center;
+            min-width: 68px;
+            border: 2px solid transparent;
+        }
+        .total-chip.leader { border-color: var(--warning); }
+        .total-chip .chip-name { font-size: 10px; color: var(--text-dim); margin-bottom: 1px; }
+        .total-chip .chip-val { font-size: 19px; font-weight: 800; color: var(--accent); }
+        .total-chip.leader .chip-val { color: var(--warning); }
+
+        /* Score table */
+        .score-table {
+            background: var(--surface);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+        .score-table-head {
+            display: grid;
+            grid-template-columns: 1fr 58px 58px 52px 64px;
+            padding: 10px 12px;
+            background: var(--surface2);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            gap: 4px;
+        }
+        .score-table-head div { text-align: center; }
+        .score-table-head div:first-child { text-align: left; }
+
+        .score-row {
+            display: grid;
+            grid-template-columns: 1fr 58px 58px 52px 64px;
+            padding: 10px 12px;
+            border-top: 1px solid var(--surface2);
+            align-items: center;
+            gap: 4px;
+        }
+        .score-row:first-child { border-top: none; }
+        .pname {
+            font-size: 14px; font-weight: 600;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .rnd-score {
+            font-size: 16px; font-weight: 700;
+            text-align: center; color: var(--success);
+        }
+        .rnd-score.none { color: var(--text-dim); font-weight: 400; }
+        .rnd-score.bonus { color: var(--warning); }
+        .total-score {
+            font-size: 18px; font-weight: 800;
+            text-align: center; color: var(--accent);
+        }
+
+        /* Nav */
+        .round-nav { display: flex; gap: 10px; }
+        .round-nav .btn { flex: 1; padding: 13px; }
+
+        /* ── Rummy 500 ── */
+        .rummy-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+        .rummy-row {
+            background: var(--surface);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border: 2px solid transparent;
+        }
+        .rummy-row.winner-row { border-color: var(--warning); }
+        .rummy-top { display: flex; align-items: baseline; justify-content: space-between; }
+        .rummy-name { font-size: 14px; font-weight: 700; }
+        .rummy-total-line {
+            font-size: 26px; font-weight: 800; color: var(--accent); line-height: 1;
+        }
+        .rummy-total-line .out-of { font-size: 12px; color: var(--text-dim); font-weight: 400; }
+        .rummy-bar { height: 4px; background: var(--surface2); border-radius: 2px; }
+        .rummy-bar-fill { height: 100%; background: var(--primary-light); border-radius: 2px; transition: width 0.3s; }
+        .rummy-row.winner-row .rummy-total-line { color: var(--warning); }
+        .rummy-entry {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .rummy-entry-label {
+            font-size: 12px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0;
+        }
+        .rummy-entry .game-input { flex: 1; }
+
+        /* ── Winner screen ── */
+        .winner-hero {
+            background: linear-gradient(135deg, #064e3b, #065f46);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .winner-hero .trophy-icon { font-size: 52px; margin-bottom: 8px; }
+        .winner-hero h2 { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+        .winner-hero p { color: var(--accent); font-size: 15px; }
+
+        .final-list {
+            background: var(--surface);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .final-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--surface2);
+        }
+        .final-row:last-child { border-bottom: none; }
+        .final-row-left { display: flex; align-items: center; gap: 12px; }
+        .rank-badge {
+            width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 800; flex-shrink: 0;
+        }
+        .r1 { background: #fbbf24; color: #111; }
+        .r2 { background: #94a3b8; color: #111; }
+        .r3 { background: #b45309; color: #fff; }
+        .r-other { background: var(--surface2); color: var(--text-dim); }
+        .final-name { font-size: 15px; font-weight: 600; }
+        .final-score { font-size: 20px; font-weight: 800; color: var(--accent); }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed; bottom: 24px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface2); color: var(--text);
+            padding: 11px 20px; border-radius: 20px;
+            font-size: 14px; font-weight: 500;
+            opacity: 0; transition: opacity 0.25s;
+            pointer-events: none; z-index: 200;
+            white-space: nowrap;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+<!-- ── Home ─────────────────────────────────────────────────── -->
+<div id="screen-home" class="screen active">
+    <div class="home-hero">
+        <h1>🃏 Score Tracker</h1>
+        <p>Choose a game to begin</p>
+    </div>
+    <div class="game-list">
+        <div class="game-card" onclick="selectGame('nine')">
+            <h2>9 Up 9 Down</h2>
+            <p>18 rounds · Bid-based · Made bid earns +10 bonus</p>
+        </div>
+        <div class="game-card" onclick="selectGame('rummy')">
+            <h2>Rummy 500</h2>
+            <p>Race to 500 points · Running totals per round</p>
+        </div>
+    </div>
+</div>
+
+<!-- ── Player Setup ──────────────────────────────────────────── -->
+<div id="screen-setup" class="screen">
+    <div class="page-header">
+        <button class="back-btn" onclick="showScreen('home')">←</button>
+        <h2 id="setup-title">Player Setup</h2>
+    </div>
+    <p class="hint">Enter 2–6 player names</p>
+    <div class="player-inputs">
+        <div class="player-row"><span class="player-badge">1</span><input type="text" id="p1" placeholder="Player 1" autocomplete="off" /></div>
+        <div class="player-row"><span class="player-badge">2</span><input type="text" id="p2" placeholder="Player 2" autocomplete="off" /></div>
+        <div class="player-row"><span class="player-badge">3</span><input type="text" id="p3" placeholder="Player 3 (optional)" autocomplete="off" /></div>
+        <div class="player-row"><span class="player-badge">4</span><input type="text" id="p4" placeholder="Player 4 (optional)" autocomplete="off" /></div>
+        <div class="player-row"><span class="player-badge">5</span><input type="text" id="p5" placeholder="Player 5 (optional)" autocomplete="off" /></div>
+        <div class="player-row"><span class="player-badge">6</span><input type="text" id="p6" placeholder="Player 6 (optional)" autocomplete="off" /></div>
+    </div>
+    <button class="btn btn-primary" onclick="startGame()">Start Game</button>
+</div>
+
+<!-- ── 9 Up 9 Down ───────────────────────────────────────────── -->
+<div id="screen-nine" class="screen">
+    <div class="game-top-bar">
+        <button class="back-btn" onclick="confirmBack()">←</button>
+        <span class="game-label">9 Up 9 Down</span>
+        <button class="btn btn-sm btn-secondary" onclick="confirmBack()">New Game</button>
+    </div>
+
+    <div class="round-card">
+        <div class="sub" id="nine-round-label">Round 1 of 18</div>
+        <div class="big" id="nine-cards">9</div>
+        <div class="label">cards this round</div>
+        <div class="round-dots" id="nine-dots"></div>
+    </div>
+
+    <div class="totals-row" id="nine-totals-row"></div>
+
+    <div id="nine-bid-warning" class="bid-warning hidden">
+        ⚠️ <span id="nine-bid-warning-text"></span>
+    </div>
+
+    <div class="score-table">
+        <div class="score-table-head">
+            <div>Player</div>
+            <div>Bid</div>
+            <div>Result</div>
+            <div>Rnd</div>
+            <div>Total</div>
+        </div>
+        <div id="nine-rows"></div>
+    </div>
+
+    <div class="round-nav">
+        <button class="btn btn-secondary" id="nine-prev" onclick="nineNav(-1)">← Back</button>
+        <button class="btn btn-primary" id="nine-next" onclick="nineNav(1)">Next →</button>
+    </div>
+</div>
+
+<!-- ── Rummy 500 ─────────────────────────────────────────────── -->
+<div id="screen-rummy" class="screen">
+    <div class="game-top-bar">
+        <button class="back-btn" onclick="confirmBack()">←</button>
+        <span class="game-label">Rummy 500</span>
+        <button class="btn btn-sm btn-secondary" onclick="confirmBack()">New Game</button>
+    </div>
+
+    <div class="round-card" style="margin-bottom:14px">
+        <div class="sub" id="rummy-round-label">Round 1</div>
+        <div class="big" style="font-size:18px;color:var(--text-dim)">First to 500 wins</div>
+    </div>
+
+    <div class="rummy-rows" id="rummy-rows"></div>
+
+    <div class="round-nav">
+        <button class="btn btn-secondary" id="rummy-prev" onclick="rummyNav(-1)">← Back</button>
+        <button class="btn btn-primary" id="rummy-next" onclick="rummyNav(1)">Next Round →</button>
+    </div>
+</div>
+
+<!-- ── Winner ────────────────────────────────────────────────── -->
+<div id="screen-winner" class="screen">
+    <div id="winner-body"></div>
+    <button class="btn btn-primary" onclick="showScreen('home')">Play Again</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
+</script>
+
+<script>
+// ── Constants ─────────────────────────────────────────────────────────────────
+const NINE_SEQ = [9,8,7,6,5,4,3,2,1,1,2,3,4,5,6,7,8,9];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let S = {
+    game: null,          // 'nine' | 'rummy'
+    players: [],
+    // 9 Up 9 Down
+    nineCur: 0,
+    nineData: [],        // [round][player] = { bid: null, result: null }
+    // Rummy 500
+    rummyCur: 0,
+    rummyData: [],       // [round][player] = points | null
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+function confirmBack() {
+    if (confirm('Return to home? Current game will be lost.')) showScreen('home');
+}
+
+function restoreFocus(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.focus();
+    const len = el.value.length;
+    try { el.setSelectionRange(len, len); } catch(e) {}
+}
+
+// ── Setup ─────────────────────────────────────────────────────────────────────
+function selectGame(game) {
+    S.game = game;
+    document.getElementById('setup-title').textContent =
+        game === 'nine' ? '9 Up 9 Down' : 'Rummy 500';
+    for (let i = 1; i <= 6; i++) document.getElementById('p' + i).value = '';
+    showScreen('setup');
+}
+
+function startGame() {
+    const players = [];
+    for (let i = 1; i <= 6; i++) {
+        const v = document.getElementById('p' + i).value.trim();
+        if (v) players.push(v);
+    }
+    if (players.length < 2) { toast('Enter at least 2 player names'); return; }
+    S.players = players;
+    S.game === 'nine' ? initNine() : initRummy();
+}
+
+// ── 9 Up 9 Down ───────────────────────────────────────────────────────────────
+function initNine() {
+    S.nineCur = 0;
+    S.nineData = NINE_SEQ.map(() =>
+        S.players.map(() => ({ bid: null, result: null }))
+    );
+    renderNine();
+    showScreen('nine');
+}
+
+function nineScore(bid, result) {
+    if (bid === null || result === null) return null;
+    return result === bid ? 10 + result : result;
+}
+
+function nineTotals() {
+    return S.players.map((_, pi) =>
+        S.nineData.reduce((sum, rnd) => {
+            const s = nineScore(rnd[pi].bid, rnd[pi].result);
+            return sum + (s ?? 0);
+        }, 0)
+    );
+}
+
+function renderNine(focusId) {
+    const cur = S.nineCur;
+    const cards = NINE_SEQ[cur];
+    const totals = nineTotals();
+    const maxTotal = Math.max(...totals, 0);
+
+    document.getElementById('nine-round-label').textContent = `Round ${cur + 1} of ${NINE_SEQ.length}`;
+    document.getElementById('nine-cards').textContent = cards;
+
+    // Progress dots
+    document.getElementById('nine-dots').innerHTML = NINE_SEQ.map((_, i) => {
+        const cls = i < cur ? 'done' : i === cur ? 'current' : '';
+        return `<div class="round-dot ${cls}"></div>`;
+    }).join('');
+
+    // Totals chips
+    document.getElementById('nine-totals-row').innerHTML = S.players.map((name, i) => {
+        const lead = totals[i] === maxTotal && maxTotal > 0;
+        return `<div class="total-chip ${lead ? 'leader' : ''}">
+            <div class="chip-name">${name.split(' ')[0]}</div>
+            <div class="chip-val">${totals[i]}</div>
+        </div>`;
+    }).join('');
+
+    // Bid warning
+    const enteredBids = S.nineData[cur].map(p => p.bid).filter(b => b !== null);
+    const bidSum = enteredBids.reduce((a, b) => a + b, 0);
+    const bidInvalid = enteredBids.length > 0 && bidSum === cards;
+    const warningEl = document.getElementById('nine-bid-warning');
+    const warningText = document.getElementById('nine-bid-warning-text');
+    if (bidInvalid) {
+        warningText.textContent = `Bids total ${bidSum} — can't equal the card count (${cards}). Adjust a bid.`;
+        warningEl.classList.remove('hidden');
+    } else {
+        warningEl.classList.add('hidden');
+    }
+
+    // Player rows
+    document.getElementById('nine-rows').innerHTML = S.players.map((name, i) => {
+        const d = S.nineData[cur][i];
+        const s = nineScore(d.bid, d.result);
+        const madeExact = d.bid !== null && d.result !== null && d.result === d.bid;
+        const scoreCls = s === null ? 'none' : madeExact ? 'bonus' : '';
+        return `
+        <div class="score-row">
+            <div class="pname">${name}</div>
+            <div><input type="text" inputmode="numeric" pattern="[0-9]*" class="game-input"
+                value="${d.bid !== null ? d.bid : ''}" placeholder="—"
+                id="nb-${i}" oninput="nineSet(${i},'bid',this.value,'nb-${i}')" /></div>
+            <div><input type="text" inputmode="numeric" pattern="[0-9]*" class="game-input"
+                value="${d.result !== null ? d.result : ''}" placeholder="—"
+                id="nr-${i}" oninput="nineSet(${i},'result',this.value,'nr-${i}')" /></div>
+            <div class="rnd-score ${scoreCls}">${s !== null ? s : '—'}</div>
+            <div class="total-score">${totals[i]}</div>
+        </div>`;
+    }).join('');
+
+    // Nav buttons
+    document.getElementById('nine-prev').disabled = cur === 0;
+    const nextBtn = document.getElementById('nine-next');
+    if (cur === NINE_SEQ.length - 1) {
+        nextBtn.textContent = 'Finish 🏆';
+        nextBtn.className = 'btn btn-warn';
+    } else {
+        nextBtn.textContent = 'Next →';
+        nextBtn.className = 'btn btn-primary';
+    }
+
+    if (focusId) restoreFocus(focusId);
+}
+
+function nineSet(pi, field, val, focusId) {
+    const clean = val.replace(/[^0-9]/g, '');
+    S.nineData[S.nineCur][pi][field] = clean === '' ? null : parseInt(clean, 10);
+    renderNine(focusId);
+}
+
+function nineNav(dir) {
+    if (dir === 1 && S.nineCur === NINE_SEQ.length - 1) { showNineWinner(); return; }
+    S.nineCur = Math.max(0, Math.min(NINE_SEQ.length - 1, S.nineCur + dir));
+    renderNine();
+}
+
+function showNineWinner() {
+    const totals = nineTotals();
+    const ranked = S.players.map((name, i) => ({ name, score: totals[i] }))
+        .sort((a, b) => b.score - a.score);
+    renderWinner(ranked, ranked[0].score + ' points');
+    showScreen('winner');
+}
+
+// ── Rummy 500 ─────────────────────────────────────────────────────────────────
+function initRummy() {
+    S.rummyCur = 0;
+    S.rummyData = [S.players.map(() => null)];
+    renderRummy();
+    showScreen('rummy');
+}
+
+function rummyTotals() {
+    return S.players.map((_, pi) =>
+        S.rummyData.reduce((sum, rnd) => sum + (rnd[pi] ?? 0), 0)
+    );
+}
+
+function renderRummy(focusId) {
+    const cur = S.rummyCur;
+    const totals = rummyTotals();
+    const hasWinner = totals.some(t => t >= 500);
+
+    document.getElementById('rummy-round-label').textContent = `Round ${cur + 1}`;
+
+    document.getElementById('rummy-rows').innerHTML = S.players.map((name, i) => {
+        const val = S.rummyData[cur][i];
+        const pct = Math.min(100, (totals[i] / 500) * 100);
+        const won = totals[i] >= 500;
+        return `
+        <div class="rummy-row ${won ? 'winner-row' : ''}">
+            <div class="rummy-top">
+                <div class="rummy-name">${name}${won ? ' 🏆' : ''}</div>
+                <div class="rummy-total-line">${totals[i]}<span class="out-of"> / 500</span></div>
+            </div>
+            <div class="rummy-bar"><div class="rummy-bar-fill" style="width:${pct}%"></div></div>
+            <div class="rummy-entry">
+                <span class="rummy-entry-label">Points this round</span>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" class="game-input"
+                    value="${val !== null ? val : ''}" placeholder="0"
+                    id="ri-${i}" oninput="rummySet(${i},this.value,'ri-${i}')" />
+            </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('rummy-prev').disabled = cur === 0;
+    const nextBtn = document.getElementById('rummy-next');
+    if (hasWinner) {
+        nextBtn.textContent = 'See Winner 🏆';
+        nextBtn.className = 'btn btn-warn';
+    } else {
+        nextBtn.textContent = 'Next Round →';
+        nextBtn.className = 'btn btn-primary';
+    }
+
+    if (focusId) restoreFocus(focusId);
+}
+
+function rummySet(pi, val, focusId) {
+    const clean = val.replace(/[^0-9]/g, '');
+    S.rummyData[S.rummyCur][pi] = clean === '' ? null : parseInt(clean, 10);
+    renderRummy(focusId);
+}
+
+function rummyNav(dir) {
+    const totals = rummyTotals();
+    if (dir === 1 && totals.some(t => t >= 500)) { showRummyWinner(); return; }
+    if (dir === 1) {
+        if (S.rummyCur === S.rummyData.length - 1)
+            S.rummyData.push(S.players.map(() => null));
+        S.rummyCur++;
+    } else {
+        S.rummyCur = Math.max(0, S.rummyCur - 1);
+    }
+    renderRummy();
+}
+
+function showRummyWinner() {
+    const totals = rummyTotals();
+    const ranked = S.players.map((name, i) => ({ name, score: totals[i] }))
+        .sort((a, b) => b.score - a.score);
+    renderWinner(ranked, `Reached ${ranked[0].score} points!`);
+    showScreen('winner');
+}
+
+// ── Winner screen ─────────────────────────────────────────────────────────────
+function renderWinner(ranked, subtitle) {
+    const medals = ['🥇','🥈','🥉'];
+    const rankClasses = ['r1','r2','r3'];
+    document.getElementById('winner-body').innerHTML = `
+        <div class="winner-hero">
+            <div class="trophy-icon">🏆</div>
+            <h2>${ranked[0].name} Wins!</h2>
+            <p>${subtitle}</p>
+        </div>
+        <div class="final-list">
+            ${ranked.map((p, i) => `
+            <div class="final-row">
+                <div class="final-row-left">
+                    <div class="rank-badge ${rankClasses[i] || 'r-other'}">${medals[i] || i + 1}</div>
+                    <span class="final-name">${p.name}</span>
+                </div>
+                <span class="final-score">${p.score}</span>
+            </div>`).join('')}
+        </div>`;
+}
+</script>
+</body>
+</html>
