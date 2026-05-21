@@ -260,6 +260,15 @@
 
         .clear-btn-wrap { padding: 8px 0 20px; }
 
+        /* ── Matrix transition ── */
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 999;
+            display: none;
+            pointer-events: none;
+        }
+
         /* ── Toast ── */
         .toast {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
@@ -370,6 +379,7 @@
     <div class="clear-btn-wrap" id="hist-clear-wrap"></div>
 </div>
 
+<canvas id="matrix-canvas"></canvas>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -568,9 +578,70 @@ function nineSet(pi, field, val, focusId) {
 }
 
 function nineNav(dir) {
-    if (dir === 1 && S.nineCur === NINE_SEQ.length - 1) { showNineWinner(); return; }
-    S.nineCur = Math.max(0, Math.min(NINE_SEQ.length - 1, S.nineCur + dir));
-    renderNine();
+    if (dir === -1) {
+        S.nineCur = Math.max(0, S.nineCur - 1);
+        renderNine();
+        return;
+    }
+    if (S.nineCur === NINE_SEQ.length - 1) {
+        matrixTransition(() => showNineWinner());
+    } else {
+        matrixTransition(() => { S.nineCur++; renderNine(); });
+    }
+}
+
+function matrixTransition(callback) {
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.display = 'block';
+    canvas.style.opacity = '1';
+    canvas.style.transition = '';
+
+    const fontSize = 15;
+    const cols = Math.floor(canvas.width / fontSize);
+    const drops = Array.from({ length: cols }, () => Math.floor(Math.random() * -40));
+    const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*';
+    const duration = 850;
+    const start = performance.now();
+    let animId;
+
+    function draw(now) {
+        const elapsed = now - start;
+        ctx.fillStyle = 'rgba(0,0,0,0.07)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = `bold ${fontSize}px monospace`;
+
+        for (let i = 0; i < cols; i++) {
+            const x = i * fontSize;
+            const y = drops[i] * fontSize;
+            // bright white head
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(chars[Math.floor(Math.random() * chars.length)], x, y);
+            // green body just behind
+            ctx.fillStyle = '#00ff41';
+            ctx.fillText(chars[Math.floor(Math.random() * chars.length)], x, y - fontSize);
+
+            if (y > canvas.height && Math.random() > 0.97) drops[i] = 0;
+            drops[i] += 0.65;
+        }
+
+        if (elapsed < duration) {
+            animId = requestAnimationFrame(draw);
+        } else {
+            cancelAnimationFrame(animId);
+            canvas.style.transition = 'opacity 0.25s';
+            canvas.style.opacity = '0';
+            setTimeout(() => {
+                canvas.style.display = 'none';
+                callback();
+            }, 260);
+        }
+    }
+
+    animId = requestAnimationFrame(draw);
 }
 
 function showNineWinner() {
