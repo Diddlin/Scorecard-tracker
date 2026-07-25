@@ -165,6 +165,14 @@
             font-size: 13px; font-weight: 600; color: #fca5a5;
         }
         .bid-warning.hidden { display: none; }
+        .bid-warning.result-warning { background: #78350f; border-color: var(--warning); color: #fde68a; }
+
+        .dealer-tag {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: var(--warning); color: #111;
+            font-size: 9px; font-weight: 800; flex-shrink: 0;
+        }
 
         .score-table { background: var(--surface); border-radius: 14px; overflow: hidden; margin-bottom: 14px; }
         .score-table-head {
@@ -181,7 +189,8 @@
             align-items: center; gap: 4px;
         }
         .score-row:first-child { border-top: none; }
-        .pname { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pname { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 5px; overflow: hidden; }
+        .pname-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .rnd-score { font-size: 16px; font-weight: 700; text-align: center; color: var(--success); }
         .rnd-score.none { color: var(--text-dim); font-weight: 400; }
         .rnd-score.bonus { color: var(--warning); }
@@ -195,7 +204,7 @@
         .rummy-row { background: var(--surface); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 6px; border: 2px solid transparent; }
         .rummy-row.winner-row { border-color: var(--warning); }
         .rummy-top { display: flex; align-items: baseline; justify-content: space-between; }
-        .rummy-name { font-size: 14px; font-weight: 700; }
+        .rummy-name { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
         .rummy-total-line { font-size: 26px; font-weight: 800; color: var(--accent); line-height: 1; }
         .rummy-total-line .out-of { font-size: 12px; color: var(--text-dim); font-weight: 400; }
         .rummy-bar { height: 4px; background: var(--surface2); border-radius: 2px; }
@@ -298,6 +307,63 @@
             pointer-events: none;
         }
 
+        /* ── Cribbage board ── */
+        .game-badge.crib { background: #1a3320; color: #4ade80; }
+
+        .crib-board-wrap { background: var(--surface); border-radius: 14px; padding: 14px; margin-bottom: 14px; overflow: hidden; }
+        .crib-board-wrap svg { display: block; width: 100%; height: auto; }
+
+        .crib-legend { display: flex; gap: 14px; justify-content: center; margin-bottom: 10px; }
+        .crib-legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+        .crib-legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+        .crib-players { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+        .crib-player-card {
+            background: var(--surface); border-radius: 14px; padding: 14px 16px;
+            border: 2px solid transparent;
+        }
+        .crib-player-card.p0-card { border-color: #ef4444; }
+        .crib-player-card.p1-card { border-color: #3b82f6; }
+        .crib-player-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .crib-player-name { font-size: 15px; font-weight: 700; }
+        .crib-player-score { font-size: 28px; font-weight: 800; color: var(--accent); }
+        .crib-score-row { display: flex; align-items: center; gap: 8px; overflow: hidden; }
+        .crib-quick-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+        .crib-quick-btn {
+            flex: 1; min-width: 36px; padding: 8px 4px;
+            background: var(--surface2); border: none; border-radius: 8px;
+            color: var(--text); font-size: 14px; font-weight: 700; cursor: pointer;
+            transition: background 0.1s;
+        }
+        .crib-quick-btn:active { background: var(--primary); }
+        .crib-stepper { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .crib-step-btn {
+            width: 34px; height: 34px; border: none; border-radius: 8px;
+            background: var(--surface2); color: var(--text);
+            font-size: 20px; font-weight: 700; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .crib-custom-input {
+            width: 50px; padding: 6px 4px;
+            background: var(--surface2); border: 2px solid transparent;
+            border-radius: 8px; color: var(--text);
+            font-size: 16px; font-weight: 700; text-align: center; outline: none;
+        }
+        .crib-custom-input:focus { border-color: var(--primary-light); }
+        .crib-score-btn {
+            padding: 8px 12px; border: none; border-radius: 8px;
+            background: var(--primary-light); color: #fff;
+            font-size: 14px; font-weight: 700; cursor: pointer;
+        }
+        .crib-score-btn:disabled { background: var(--surface2); color: var(--text-dim); cursor: default; }
+        .crib-undo-btn {
+            width: 100%; padding: 8px; border: none; border-radius: 8px;
+            background: var(--surface2); color: var(--text-dim);
+            font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px;
+        }
+        .crib-undo-btn:not([disabled]):active { background: var(--warning); color: #111; }
+        .crib-undo-btn[disabled] { opacity: 0.35; cursor: default; }
+
         /* ── Toast ── */
         .toast {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
@@ -321,6 +387,7 @@
     <div class="game-list">
         <div class="game-card" onclick="selectGame('nine')"><h2>9 Up 9 Down</h2></div>
         <div class="game-card" onclick="selectGame('rummy')"><h2>Rummy 500</h2></div>
+        <div class="game-card" onclick="selectGame('crib')"><h2>Cribbage</h2></div>
         <button class="hist-btn" onclick="showHistory()">📊 History &amp; Stats</button>
     </div>
 </div>
@@ -358,6 +425,7 @@
     </div>
     <div class="totals-row" id="nine-totals-row"></div>
     <div id="nine-bid-warning" class="bid-warning hidden">⚠️ <span id="nine-bid-warning-text"></span></div>
+    <div id="nine-result-warning" class="bid-warning result-warning hidden">🧮 <span id="nine-result-warning-text"></span></div>
     <div class="score-table">
         <div class="score-table-head">
             <div>Player</div><div>Bid</div><div>Result</div><div>Rnd</div><div>Total</div>
@@ -386,6 +454,20 @@
         <button class="btn btn-secondary" id="rummy-prev" onclick="rummyNav(-1)">← Back</button>
         <button class="btn btn-primary" id="rummy-next" onclick="rummyNav(1)">Next Round →</button>
     </div>
+</div>
+
+<!-- ── Cribbage ── -->
+<div id="screen-crib" class="screen">
+    <div class="game-top-bar">
+        <button class="back-btn" onclick="confirmBack()">←</button>
+        <span class="game-label">Cribbage</span>
+        <button class="btn btn-sm btn-secondary" onclick="confirmBack()">New Game</button>
+    </div>
+    <div class="crib-legend" id="crib-legend"></div>
+    <div class="crib-board-wrap">
+        <svg id="crib-svg" viewBox="0 0 310 130" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="crib-players" id="crib-players"></div>
 </div>
 
 <!-- ── Winner ── -->
@@ -453,6 +535,9 @@ let S = {
     nineData: [],
     rummyCur: 0,
     rummyData: [],
+    rummyOvertime: false,
+    rummyOvertimeContenders: [],
+    crib: { animating: false, players: [] },
 };
 
 let histTab = 'games';
@@ -516,8 +601,17 @@ function pickSugg(n, name) {
 // ── Setup ──────────────────────────────────────────────────────────────────────
 function selectGame(game) {
     S.game = game;
-    document.getElementById('setup-title').textContent = game === 'nine' ? '9 Up 9 Down' : 'Rummy 500';
-    for (let i = 1; i <= 6; i++) { document.getElementById('p' + i).value = ''; document.getElementById('sugg-' + i).innerHTML = ''; }
+    const titles = { nine: '9 Up 9 Down', rummy: 'Rummy 500', crib: 'Cribbage' };
+    document.getElementById('setup-title').textContent = titles[game] || game;
+    const maxPlayers = game === 'crib' ? 2 : 6;
+    document.querySelector('#screen-setup .hint').textContent =
+        game === 'crib' ? 'Enter 2 player names' : 'Enter 2–6 player names';
+    for (let i = 1; i <= 6; i++) {
+        const row = document.querySelector(`.player-row:nth-child(${i})`);
+        if (row) row.style.display = i <= maxPlayers ? '' : 'none';
+        document.getElementById('p' + i).value = '';
+        document.getElementById('sugg-' + i).innerHTML = '';
+    }
     showScreen('setup');
 }
 
@@ -527,9 +621,14 @@ function startGame() {
         const v = document.getElementById('p' + i).value.trim();
         if (v) players.push(v);
     }
-    if (players.length < 2) { toast('Enter at least 2 player names'); return; }
+    const minPlayers = 2;
+    const maxPlayers = S.game === 'crib' ? 2 : 6;
+    if (players.length < minPlayers) { toast('Enter at least 2 player names'); return; }
+    if (players.length > maxPlayers) { toast(`Cribbage is 2 players only`); return; }
     S.players = players;
-    S.game === 'nine' ? initNine() : initRummy();
+    if (S.game === 'nine') initNine();
+    else if (S.game === 'rummy') initRummy();
+    else initCrib();
 }
 
 // ── 9 Up 9 Down ────────────────────────────────────────────────────────────────
@@ -581,6 +680,19 @@ function renderNine(focusId) {
         `Bids total ${bidSum} — can't equal the card count (${cards}). Adjust a bid.`;
     warningEl.classList.toggle('hidden', !bidInvalid);
 
+    const enteredResults = S.nineData[cur].map(p => p.result).filter(r => r !== null);
+    const resultsComplete = enteredResults.length === S.players.length;
+    const resultSum = enteredResults.reduce((a, b) => a + b, 0);
+    const resultMismatch = resultsComplete && resultSum !== cards;
+    const resultWarningEl = document.getElementById('nine-result-warning');
+    if (resultMismatch) {
+        const diff = resultSum - cards;
+        document.getElementById('nine-result-warning-text').textContent =
+            `Results total ${resultSum} — should equal ${cards} (cards this round). Off by ${Math.abs(diff)}.`;
+    }
+    resultWarningEl.classList.toggle('hidden', !resultMismatch);
+
+    const dealerIdx = cur % S.players.length;
     document.getElementById('nine-rows').innerHTML = S.players.map((name, i) => {
         const d = S.nineData[cur][i];
         const s = nineScore(d.bid, d.result);
@@ -588,7 +700,7 @@ function renderNine(focusId) {
         const scoreCls = s === null ? 'none' : madeExact ? 'bonus' : '';
         return `
         <div class="score-row">
-            <div class="pname">${name}</div>
+            <div class="pname">${i === dealerIdx ? '<span class="dealer-tag">D</span>' : ''}<span class="pname-text">${name}</span></div>
             <div><input type="text" inputmode="numeric" pattern="[0-9]*" class="game-input"
                 value="${d.bid !== null ? d.bid : ''}" placeholder="—"
                 id="nb-${i}" oninput="nineSet(${i},'bid',this.value,'nb-${i}')" /></div>
@@ -725,6 +837,8 @@ function showNineWinner() {
 function initRummy() {
     S.rummyCur = 0;
     S.rummyData = [S.players.map(() => null)];
+    S.rummyOvertime = false;
+    S.rummyOvertimeContenders = [];
     renderRummy();
     showScreen('rummy');
 }
@@ -737,32 +851,40 @@ function renderRummy(focusId) {
     const cur = S.rummyCur;
     const totals = rummyTotals();
     const hasWinner = totals.some(t => t >= 500);
+    const isOvertimeRound = S.rummyOvertime && cur === S.rummyData.length - 1;
+    const dealerIdx = cur % S.players.length;
 
-    document.getElementById('rummy-round-label').textContent = `Round ${cur + 1}`;
+    document.getElementById('rummy-round-label').textContent =
+        isOvertimeRound ? 'Overtime Round — Tiebreaker' : `Round ${cur + 1}`;
 
     document.getElementById('rummy-rows').innerHTML = S.players.map((name, i) => {
         const val = S.rummyData[cur][i];
         const pct = Math.min(100, (totals[i] / 500) * 100);
-        const won = totals[i] >= 500;
+        const won = totals[i] >= 500 && !isOvertimeRound;
+        const isContender = !isOvertimeRound || S.rummyOvertimeContenders.includes(i);
+        const dealerBadge = i === dealerIdx ? '<span class="dealer-tag">D</span>' : '';
         return `
-        <div class="rummy-row ${won ? 'winner-row' : ''}">
+        <div class="rummy-row ${won ? 'winner-row' : ''}" style="${isContender ? '' : 'opacity:0.4'}">
             <div class="rummy-top">
-                <div class="rummy-name">${name}${won ? ' 🏆' : ''}</div>
+                <div class="rummy-name">${dealerBadge}${name}${won ? ' 🏆' : ''}</div>
                 <div class="rummy-total-line">${totals[i]}<span class="out-of"> / 500</span></div>
             </div>
             <div class="rummy-bar"><div class="rummy-bar-fill" style="width:${pct}%"></div></div>
+            ${isContender ? `
             <div class="rummy-entry">
                 <span class="rummy-entry-label">Points this round</span>
                 <input type="text" inputmode="numeric" pattern="[0-9]*" class="game-input"
                     value="${val !== null ? val : ''}" placeholder="0"
                     id="ri-${i}" oninput="rummySet(${i},this.value,'ri-${i}')" />
-            </div>
+            </div>` : `
+            <div class="rummy-entry"><span class="rummy-entry-label" style="font-style:italic">Not in tiebreaker</span></div>`}
         </div>`;
     }).join('');
 
     document.getElementById('rummy-prev').disabled = cur === 0;
     const nextBtn = document.getElementById('rummy-next');
-    if (hasWinner) { nextBtn.textContent = 'See Winner 🏆'; nextBtn.className = 'btn btn-warn'; }
+    if (isOvertimeRound) { nextBtn.textContent = 'Settle Tiebreaker 🏆'; nextBtn.className = 'btn btn-warn'; }
+    else if (hasWinner) { nextBtn.textContent = 'See Winner 🏆'; nextBtn.className = 'btn btn-warn'; }
     else { nextBtn.textContent = 'Next Round →'; nextBtn.className = 'btn btn-primary'; }
 
     if (focusId) restoreFocus(focusId);
@@ -774,21 +896,60 @@ function rummySet(pi, val, focusId) {
     renderRummy(focusId);
 }
 
+function startRummyOvertime(contenders) {
+    S.rummyOvertime = true;
+    S.rummyOvertimeContenders = contenders;
+    S.rummyData.push(S.players.map(() => null));
+    S.rummyCur = S.rummyData.length - 1;
+    renderRummy();
+    toast(`Tie! Overtime round: ${contenders.map(i => S.players[i]).join(' vs ')}`);
+}
+
 function rummyNav(dir) {
+    if (dir === -1) {
+        S.rummyCur = Math.max(0, S.rummyCur - 1);
+        renderRummy();
+        return;
+    }
+
+    if (S.rummyOvertime && S.rummyCur === S.rummyData.length - 1) {
+        const cur = S.rummyData[S.rummyCur];
+        const contenders = S.rummyOvertimeContenders;
+        const allEntered = contenders.every(i => cur[i] !== null);
+        if (!allEntered) { toast('Enter a score for both tied players'); return; }
+        const scores = contenders.map(i => cur[i] ?? 0);
+        const maxScore = Math.max(...scores);
+        const roundWinners = contenders.filter(i => (cur[i] ?? 0) === maxScore);
+        if (roundWinners.length > 1) {
+            startRummyOvertime(roundWinners);
+            return;
+        }
+        showRummyWinner(roundWinners[0]);
+        return;
+    }
+
     const totals = rummyTotals();
-    if (dir === 1 && totals.some(t => t >= 500)) { showRummyWinner(); return; }
-    if (dir === 1) {
-        if (S.rummyCur === S.rummyData.length - 1) S.rummyData.push(S.players.map(() => null));
-        S.rummyCur++;
-    } else { S.rummyCur = Math.max(0, S.rummyCur - 1); }
+    if (totals.some(t => t >= 500)) {
+        const maxTotal = Math.max(...totals);
+        const contenders = totals.reduce((arr, t, i) => { if (t === maxTotal) arr.push(i); return arr; }, []);
+        if (contenders.length > 1) { startRummyOvertime(contenders); return; }
+        showRummyWinner(contenders[0]);
+        return;
+    }
+
+    if (S.rummyCur === S.rummyData.length - 1) S.rummyData.push(S.players.map(() => null));
+    S.rummyCur++;
     renderRummy();
 }
 
-function showRummyWinner() {
+function showRummyWinner(winnerIdx) {
     const totals = rummyTotals();
-    const ranked = S.players.map((name, i) => ({ name, score: totals[i] })).sort((a, b) => b.score - a.score);
+    let ranked = S.players.map((name, i) => ({ name, score: totals[i], idx: i }));
+    ranked.sort((a, b) => (a.idx === winnerIdx ? -1 : b.idx === winnerIdx ? 1 : b.score - a.score));
+    ranked = ranked.map(({ name, score }) => ({ name, score }));
     DB.saveGame({ id: Date.now().toString(), type: 'rummy', date: new Date().toISOString(), players: ranked, winner: ranked[0].name });
-    renderWinner(ranked, `Reached ${ranked[0].score} points!`);
+    const subtitle = S.rummyOvertime ? 'Won the overtime tiebreaker!' : `Reached ${ranked[0].score} points!`;
+    renderWinner(ranked, subtitle);
     showScreen('winner');
 }
 
@@ -844,7 +1005,7 @@ function renderHistoryScreen() {
             const dt = new Date(g.date);
             const dateStr = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             const timeStr = dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-            const badge = g.type === 'nine' ? '9 Up 9 Down' : 'Rummy 500';
+            const badge = g.type === 'nine' ? '9 Up 9 Down' : g.type === 'crib' ? 'Cribbage' : 'Rummy 500';
             return `
             <div class="hist-card">
                 <div class="hist-card-header">
@@ -896,6 +1057,301 @@ function renderHistoryScreen() {
             </div>`).join('');
         clearWrap.innerHTML = '';
     }
+}
+
+// ── Cribbage ───────────────────────────────────────────────────────────────────
+const CRIB_WIN = 121;
+const C_COLS = 20;
+const C_ROWS = 6;
+const C_HOLE_R = 3.5;
+const C_STEP = 13;
+const C_GROUP_GAP = 6;   // extra px between every 5 holes
+const C_ROW_STEP = 24;
+const C_PAD_X = 18;
+const C_PAD_Y = 10;
+const CRIB_WIN_X = 154;
+const CRIB_WIN_Y = 147;
+const CRIB_COLORS = ['#ef4444', '#3b82f6'];
+
+function cribHoleXY(holeNum) {
+    const row = Math.floor(holeNum / C_COLS);
+    const rawCol = holeNum % C_COLS;
+    const col = row % 2 === 0 ? rawCol : (C_COLS - 1 - rawCol);
+    const x = C_PAD_X + C_HOLE_R + col * C_STEP + Math.floor(col / 5) * C_GROUP_GAP;
+    const y = C_PAD_Y + C_HOLE_R + row * C_ROW_STEP;
+    return { x, y };
+}
+
+function buildCribSVG() {
+    const svg = document.getElementById('crib-svg');
+    svg.setAttribute('viewBox', '0 0 310 155');
+
+    // Precompute edge positions
+    const xL = C_PAD_X + C_HOLE_R;
+    const xR = C_PAD_X + C_HOLE_R + 19 * C_STEP + 3 * C_GROUP_GAP;
+
+    let h = '<rect width="310" height="155" rx="8" fill="#152815"/>';
+
+    // Row connectors — curved arc at each row transition
+    for (let r = 0; r < 5; r++) {
+        const y0 = C_PAD_Y + C_HOLE_R + r * C_ROW_STEP;
+        const y1 = y0 + C_ROW_STEP;
+        const midY = (y0 + y1) / 2;
+        if (r % 2 === 0) {
+            // Right side: end of even row → start of odd row
+            h += `<path d="M ${xR} ${y0+C_HOLE_R+1} C ${xR+11} ${midY} ${xR+11} ${midY} ${xR} ${y1-C_HOLE_R-1}" stroke="#2a5a2a" stroke-width="1.5" fill="none"/>`;
+        } else {
+            // Left side: end of odd row → start of even row
+            h += `<path d="M ${xL} ${y0+C_HOLE_R+1} C ${xL-11} ${midY} ${xL-11} ${midY} ${xL} ${y1-C_HOLE_R-1}" stroke="#2a5a2a" stroke-width="1.5" fill="none"/>`;
+        }
+    }
+
+    // Dashed connector from score 120 (bottom-left) to WIN hole (center)
+    const y5 = C_PAD_Y + C_HOLE_R + 5 * C_ROW_STEP;
+    h += `<path d="M ${xL} ${y5+C_HOLE_R+1} Q ${xL+30} ${y5+22} ${CRIB_WIN_X} ${CRIB_WIN_Y-7}" stroke="#fbbf24" stroke-width="1" fill="none" stroke-dasharray="2,2" opacity="0.6"/>`;
+
+    // 120 holes — groups of 5 visually distinct
+    for (let hole = 0; hole < 120; hole++) {
+        const {x, y} = cribHoleXY(hole);
+        const score = hole + 1;
+        const isFive  = score % 5  === 0;
+        const isTen   = score % 10 === 0;
+        const row = Math.floor(hole / C_COLS);
+
+        h += `<circle cx="${x}" cy="${y}" r="${C_HOLE_R}"
+              fill="${isFive ? '#1c421c' : '#0d230d'}"
+              stroke="${isFive ? '#3d7a3d' : '#1e421e'}"
+              stroke-width="${isFive ? '1.3' : '0.8'}"/>`;
+
+        // Score label every 10 holes, placed outside the track
+        if (isTen) {
+            const lY = row % 2 === 0 ? y + C_HOLE_R + 6.5 : y - C_HOLE_R - 1.5;
+            h += `<text x="${x}" y="${lY}" text-anchor="middle" font-size="5.5" fill="#5aaa5a" font-weight="bold">${score}</text>`;
+        }
+    }
+
+    // LEFT margin — direction arrow + score anchor at left side of each row
+    // Even rows start from left; odd rows END at left
+    const leftInfo = [
+        [0, '1→'],   // row 0 starts at left, score 1
+        [1, '←40'],  // row 1 ends at left, score 40
+        [2, '41→'],  // row 2 starts at left, score 41
+        [3, '←80'],  // row 3 ends at left, score 80
+        [4, '81→'],  // row 4 starts at left, score 81
+        [5, '←120'], // row 5 ends at left, score 120
+    ];
+    leftInfo.forEach(([r, lbl]) => {
+        const y = C_PAD_Y + C_HOLE_R + r * C_ROW_STEP + 3;
+        h += `<text x="8" y="${y}" text-anchor="middle" font-size="6" fill="#3a7a3a" font-weight="bold">${lbl}</text>`;
+    });
+
+    // RIGHT margin — start score for rows that begin at the right (odd rows)
+    [[1,'21→'],[3,'61→'],[5,'101→']].forEach(([r, lbl]) => {
+        const y = C_PAD_Y + C_HOLE_R + r * C_ROW_STEP + 3;
+        h += `<text x="${xR+10}" y="${y}" text-anchor="start" font-size="5.5" fill="#3a7a3a" font-weight="bold">${lbl}</text>`;
+    });
+
+    // START marker above hole 1
+    h += `<text x="${xL}" y="7" text-anchor="start" font-size="5.5" fill="#6abf6a" font-style="italic">START</text>`;
+
+    // WIN hole
+    h += `<circle cx="${CRIB_WIN_X}" cy="${CRIB_WIN_Y}" r="7" fill="#0a1e0a" stroke="#fbbf24" stroke-width="2"/>`;
+    h += `<text x="${CRIB_WIN_X}" y="${CRIB_WIN_Y+2.5}" text-anchor="middle" font-size="5.5" fill="#fbbf24" font-weight="bold">WIN</text>`;
+
+    // Pegs — rendered last so they're on top
+    S.crib.players.forEach((_, pi) => {
+        const color = CRIB_COLORS[pi];
+        h += `<circle id="cpeg-${pi}-b" cx="-20" cy="-20" r="3.5" fill="${color}" opacity="0.55" style="display:none"/>`;
+        h += `<circle id="cpeg-${pi}-f" cx="-20" cy="-20" r="5" fill="${color}" stroke="white" stroke-width="1.2" style="display:none"/>`;
+    });
+
+    svg.innerHTML = h;
+}
+
+function cribPegPos(score) {
+    if (score <= 0) return null;
+    if (score >= CRIB_WIN) return { x: CRIB_WIN_X, y: CRIB_WIN_Y };
+    return cribHoleXY(score - 1);
+}
+
+function placePegs() {
+    S.crib.players.forEach((p, pi) => {
+        const fEl = document.getElementById(`cpeg-${pi}-f`);
+        const bEl = document.getElementById(`cpeg-${pi}-b`);
+        const offset = pi === 0 ? -2.5 : 2.5;
+
+        if (p.front > 0) {
+            const fp = cribPegPos(p.front);
+            fEl.setAttribute('cx', fp.x);
+            fEl.setAttribute('cy', fp.y + offset);
+            fEl.style.display = '';
+        } else {
+            fEl.style.display = 'none';
+        }
+
+        if (p.back > 0) {
+            const bp = cribPegPos(p.back);
+            bEl.setAttribute('cx', bp.x);
+            bEl.setAttribute('cy', bp.y + offset);
+            bEl.style.display = '';
+        } else {
+            bEl.style.display = 'none';
+        }
+    });
+}
+
+function animateCribPeg(pi, fromScore, toScore, cb) {
+    const el = document.getElementById(`cpeg-${pi}-b`);
+    if (!el) { cb(); return; }
+    const offset = pi === 0 ? -2.5 : 2.5;
+    const fromPos = fromScore > 0 ? cribPegPos(fromScore) : cribPegPos(toScore);
+    const toPos = cribPegPos(toScore);
+    const duration = 500;
+    const start = Date.now();
+    el.style.display = '';
+
+    function step() {
+        const t = Math.min(1, (Date.now() - start) / duration);
+        const ease = 1 - Math.pow(1 - t, 3);
+        const x = fromPos.x + (toPos.x - fromPos.x) * ease;
+        const y = (fromPos.y + offset) + (toPos.y + offset - (fromPos.y + offset)) * ease;
+        el.setAttribute('cx', x);
+        el.setAttribute('cy', y);
+        if (t < 1) { setTimeout(step, 16); }
+        else { cb(); }
+    }
+    step();
+}
+
+function initCrib() {
+    S.crib = {
+        animating: false,
+        players: S.players.slice(0, 2).map(name => ({ name, front: 0, back: 0, history: [] }))
+    };
+    buildCribSVG();
+    placePegs();
+    renderCrib();
+    showScreen('crib');
+}
+
+function undoCribScore(pi) {
+    if (S.crib.animating) return;
+    const p = S.crib.players[pi];
+    if (!p.history.length) { toast('Nothing to undo'); return; }
+    const prev = p.history.pop();
+    p.front = prev.front;
+    p.back  = prev.back;
+    placePegs();
+    renderCrib();
+}
+
+function renderCrib() {
+    // Legend
+    document.getElementById('crib-legend').innerHTML = S.crib.players.map((p, i) =>
+        `<div class="crib-legend-item">
+            <div class="crib-legend-dot" style="background:${CRIB_COLORS[i]}"></div>
+            <span>${p.name}</span>
+        </div>`
+    ).join('');
+
+    // Player cards
+    document.getElementById('crib-players').innerHTML = S.crib.players.map((p, pi) => `
+        <div class="crib-player-card p${pi}-card">
+            <div class="crib-player-top">
+                <span class="crib-player-name" style="color:${CRIB_COLORS[pi]}">${p.name}</span>
+                <span class="crib-player-score">${p.front} <span style="font-size:13px;color:var(--text-dim);font-weight:500">/ 121</span></span>
+            </div>
+            <div class="crib-score-row">
+                <div class="crib-quick-btns">
+                    ${[1,2,3,4,5,6,7,8].map(n =>
+                        `<button class="crib-quick-btn" onclick="cribScore(${pi},${n})">${n}</button>`
+                    ).join('')}
+                </div>
+            </div>
+            <div class="crib-score-row" style="margin-top:8px">
+                <button class="crib-step-btn" onclick="cribStepCustom(${pi},-1)">−</button>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" class="crib-custom-input"
+                    id="crib-custom-${pi}" value="1" />
+                <button class="crib-step-btn" onclick="cribStepCustom(${pi},1)">+</button>
+                <button class="crib-score-btn" style="flex-shrink:0"
+                    onclick="cribScoreCustom(${pi})" ${S.crib.animating ? 'disabled' : ''}>Score</button>
+            </div>
+            <button class="crib-undo-btn" onclick="undoCribScore(${pi})" ${p.history.length === 0 ? 'disabled' : ''}>↩ Undo Last Score</button>
+        </div>`
+    ).join('');
+}
+
+function cribStepCustom(pi, delta) {
+    const el = document.getElementById(`crib-custom-${pi}`);
+    const cur = parseInt(el.value) || 1;
+    el.value = Math.max(1, cur + delta);
+}
+
+function cribScoreCustom(pi) {
+    const el = document.getElementById(`crib-custom-${pi}`);
+    const pts = Math.max(1, parseInt(el.value) || 1);
+    cribScore(pi, pts);
+}
+
+function cribScore(pi, pts) {
+    if (S.crib.animating) return;
+    S.crib.animating = true;
+
+    const p = S.crib.players[pi];
+    p.history.push({ front: p.front, back: p.back });
+    const fromFront = p.front;
+    const newScore = Math.min(CRIB_WIN, p.front + pts);
+
+    // Animate back peg from its old position to new score
+    animateCribPeg(pi, fromFront, newScore, () => {
+        // After animation: back becomes new front, old front becomes new back
+        p.back = fromFront;
+        p.front = newScore;
+
+        // Update front peg position (no animation, it just moves to old front pos)
+        const fEl = document.getElementById(`cpeg-${pi}-f`);
+        const offset = pi === 0 ? -2.5 : 2.5;
+        if (p.back > 0) {
+            const bp = cribPegPos(p.back);
+            fEl.setAttribute('cx', bp.x);
+            fEl.setAttribute('cy', bp.y + offset);
+        } else {
+            fEl.style.display = 'none';
+        }
+
+        // Back peg (which just animated) is now the new front — swap visual styles
+        const bEl = document.getElementById(`cpeg-${pi}-b`);
+        // Promote bEl to front (bright, larger)
+        bEl.setAttribute('r', '5.5');
+        bEl.setAttribute('opacity', '1');
+        bEl.setAttribute('stroke', 'white');
+        bEl.setAttribute('stroke-width', '1');
+        // Demote fEl to back (dim, smaller)
+        fEl.setAttribute('r', '4');
+        fEl.setAttribute('opacity', '0.4');
+        fEl.removeAttribute('stroke');
+        fEl.removeAttribute('stroke-width');
+
+        // Swap IDs
+        bEl.id = `cpeg-${pi}-f`;
+        fEl.id = `cpeg-${pi}-b`;
+
+        S.crib.animating = false;
+        renderCrib();
+
+        if (p.front >= CRIB_WIN) {
+            setTimeout(() => showCribWinner(), 300);
+        }
+    });
+}
+
+function showCribWinner() {
+    const players = S.crib.players;
+    const ranked = [...players].sort((a, b) => b.front - a.front);
+    DB.saveGame({ id: Date.now().toString(), type: 'crib', date: new Date().toISOString(),
+        players: ranked.map(p => ({ name: p.name, score: p.front })), winner: ranked[0].name });
+    renderWinner(ranked.map(p => ({ name: p.name, score: p.front })), `${ranked[0].name} reached 121!`);
+    showScreen('winner');
 }
 
 function clearHistory() {
