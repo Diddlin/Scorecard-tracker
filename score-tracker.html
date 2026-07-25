@@ -502,7 +502,25 @@
 <div class="toast" id="toast"></div>
 
 <script>
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+    // When a new service worker takes control (i.e. a fresh version was
+    // just pushed and detected), reload once so the page picks it up
+    // automatically instead of showing a stale cached version.
+    let swRefreshed = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (swRefreshed) return;
+        swRefreshed = true;
+        location.reload();
+    });
+    // Proactively re-check for a new version whenever the app is opened
+    // or brought back to the foreground.
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            navigator.serviceWorker.getRegistration().then(reg => reg && reg.update());
+        }
+    });
+}
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const NINE_SEQ = [9,8,7,6,5,4,3,2,1,1,2,3,4,5,6,7,8,9];
