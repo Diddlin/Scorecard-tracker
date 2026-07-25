@@ -740,7 +740,23 @@ function renderNine(focusId) {
 
 function nineSet(pi, field, val, focusId) {
     const clean = val.replace(/[^0-9]/g, '');
-    S.nineData[S.nineCur][pi][field] = clean === '' ? null : parseInt(clean, 10);
+    const newVal = clean === '' ? null : parseInt(clean, 10);
+    S.nineData[S.nineCur][pi][field] = newVal;
+
+    // If that leaves exactly one player's result blank, auto-fill it with
+    // whatever's left of the round's card count — every card played goes
+    // to someone, so the last result is never a free choice.
+    if (field === 'result' && newVal !== null) {
+        const cards = NINE_SEQ[S.nineCur];
+        const round = S.nineData[S.nineCur];
+        const missing = round.reduce((arr, p, i) => { if (p.result === null) arr.push(i); return arr; }, []);
+        if (missing.length === 1) {
+            const enteredSum = round.reduce((sum, p) => sum + (p.result ?? 0), 0);
+            const remainder = cards - enteredSum;
+            if (remainder >= 0) round[missing[0]].result = remainder;
+        }
+    }
+
     renderNine(focusId);
 }
 
