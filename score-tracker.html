@@ -344,31 +344,32 @@
         }
         .crib-quick-btn:active { background: var(--primary); transform: scale(0.94); }
 
-        .crib-manual { display: flex; align-items: stretch; gap: 6px; flex: 0 0 auto; height: 44px; }
+        .crib-manual { display: flex; align-items: stretch; gap: 6px; flex: 0 0 auto; height: 46px; }
         .crib-step-btn {
-            width: 38px; flex: 0 0 38px; border: none; border-radius: 10px;
+            width: 44px; flex: 0 0 44px; border: none; border-radius: 10px;
             background: var(--surface2); color: var(--text);
-            font-size: 20px; font-weight: 700; cursor: pointer;
+            font-size: 22px; font-weight: 700; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
         }
         .crib-step-btn:active { background: var(--primary); }
-        /* `input` in the selector so this beats the global input[type="text"] width */
+        /* Wide, obviously tappable target — `input` in the selector so this beats
+           the global input[type="text"] width */
         input.crib-custom-input {
-            width: 56px; flex: 0 0 56px; padding: 0;
-            background: var(--surface2); border: 2px solid transparent;
+            flex: 1 1 auto; min-width: 0; width: auto; padding: 0;
+            background: var(--bg); border: 2px solid var(--surface2);
             border-radius: 10px; color: var(--text);
-            font-size: 17px; font-weight: 700; text-align: center; outline: none;
+            font-size: 19px; font-weight: 800; text-align: center; outline: none;
         }
-        input.crib-custom-input:focus { border-color: var(--primary-light); }
+        input.crib-custom-input:focus { border-color: var(--primary-light); background: var(--surface2); }
         .crib-score-btn {
-            flex: 1 1 auto; min-width: 0; border: none; border-radius: 10px;
+            flex: 0 0 88px; border: none; border-radius: 10px;
             background: var(--primary-light); color: #fff;
             font-size: 15px; font-weight: 700; cursor: pointer;
         }
         .crib-undo-btn {
-            width: 44px; flex: 0 0 44px; border: none; border-radius: 10px;
+            flex: 0 0 auto; height: 34px; width: 100%; border: none; border-radius: 10px;
             background: var(--surface2); color: var(--text-dim);
-            font-size: 15px; font-weight: 700; cursor: pointer;
+            font-size: 13px; font-weight: 700; cursor: pointer;
         }
         .crib-undo-btn:not([disabled]):active { background: var(--warning); color: #111; }
         .crib-undo-btn[disabled] { opacity: 0.3; cursor: default; }
@@ -394,12 +395,14 @@
         }
 
         /* Short screens: trim the chrome so both halves stay usable */
-        @media (max-height: 620px) {
+        @media (max-height: 680px) {
+            .crib-side { gap: 6px; }
             .crib-total { font-size: 24px; }
             .crib-quick-btn { font-size: 19px; }
-            .crib-quick { max-height: 110px; }
-            .crib-manual { height: 38px; }
-            .crib-board-wrap { height: clamp(66px, 15vh, 96px); }
+            .crib-quick { max-height: 100px; }
+            .crib-manual { height: 40px; }
+            .crib-undo-btn { height: 28px; font-size: 12px; }
+            .crib-board-wrap { height: clamp(60px, 14vh, 96px); }
         }
 
         /* ── Toast ── */
@@ -1414,6 +1417,13 @@ function undoCribScore(pi) {
 // Quick-score presets — the hands you actually peg most often
 const CRIB_QUICK = [1, 2, 3, 4, 8];
 
+// Name the entry that would be rolled back, so a misfire is obvious before undoing
+function cribUndoLabel(p) {
+    if (!p.history.length) return '↩ Nothing to undo';
+    const prev = p.history[p.history.length - 1];
+    return `↩ Undo +${p.front - prev.front}`;
+}
+
 function renderCrib() {
     // Either half can re-render while the other player is typing a manual score
     const focused = document.activeElement;
@@ -1443,13 +1453,15 @@ function renderCrib() {
             <div class="crib-manual">
                 <button class="crib-step-btn" onclick="cribStepCustom(${pi},-1)">−</button>
                 <input type="text" inputmode="numeric" pattern="[0-9]*" class="crib-custom-input"
-                    id="crib-custom-${pi}" value="${S.crib.custom[pi]}"
-                    oninput="S.crib.custom[${pi}] = this.value" />
+                    id="crib-custom-${pi}" value="${S.crib.custom[pi]}" aria-label="Points to add"
+                    oninput="S.crib.custom[${pi}] = this.value"
+                    onfocus="this.select()"
+                    onkeydown="if (event.key === 'Enter') cribScoreCustom(${pi})" />
                 <button class="crib-step-btn" onclick="cribStepCustom(${pi},1)">+</button>
                 <button class="crib-score-btn" onclick="cribScoreCustom(${pi})">Score</button>
-                <button class="crib-undo-btn" onclick="undoCribScore(${pi})"
-                    title="Undo last score" ${p.busy || p.history.length === 0 ? 'disabled' : ''}>↩</button>
-            </div>`;
+            </div>
+            <button class="crib-undo-btn" onclick="undoCribScore(${pi})"
+                ${p.busy || p.history.length === 0 ? 'disabled' : ''}>${cribUndoLabel(p)}</button>`;
     });
 
     // Center strip — who's ahead, and by how much
