@@ -307,62 +307,100 @@
             pointer-events: none;
         }
 
-        /* ── Cribbage board ── */
+        /* ── Cribbage: split screen (one half per player, facing each other) ── */
         .game-badge.crib { background: #1a3320; color: #4ade80; }
 
-        .crib-board-wrap { background: var(--surface); border-radius: 14px; padding: 14px; margin-bottom: 14px; overflow: hidden; }
-        .crib-board-wrap svg { display: block; width: 100%; height: auto; }
-
-        .crib-legend { display: flex; gap: 14px; justify-content: center; margin-bottom: 10px; }
-        .crib-legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
-        .crib-legend-dot { width: 12px; height: 12px; border-radius: 50%; }
-
-        .crib-players { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
-        .crib-player-card {
-            background: var(--surface); border-radius: 14px; padding: 14px 16px;
-            border: 2px solid transparent;
+        #screen-crib { padding: 6px; }
+        #screen-crib.active {
+            display: flex; flex-direction: column; gap: 6px;
+            height: 100vh; height: 100dvh; min-height: 0; overflow: hidden;
         }
-        .crib-player-card.p0-card { border-color: #ef4444; }
-        .crib-player-card.p1-card { border-color: #3b82f6; }
-        .crib-player-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .crib-player-name { font-size: 15px; font-weight: 700; }
-        .crib-player-score { font-size: 28px; font-weight: 800; color: var(--accent); }
-        .crib-score-row { display: flex; align-items: center; gap: 8px; overflow: hidden; }
-        .crib-quick-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+
+        /* Player half */
+        .crib-side {
+            flex: 1 1 0; min-height: 0;
+            display: flex; flex-direction: column; justify-content: center; gap: 8px;
+            background: var(--surface); border: 2px solid var(--pc, var(--surface2));
+            border-radius: 16px; padding: 8px 10px;
+        }
+        .crib-side.flipped { transform: rotate(180deg); }
+
+        .crib-head { display: flex; align-items: center; gap: 7px; flex: 0 0 auto; padding: 0 2px; }
+        .crib-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--pc); flex-shrink: 0; }
+        .crib-name {
+            font-size: 15px; font-weight: 700; color: var(--pc);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .crib-lead { font-size: 11px; font-weight: 700; color: var(--text-dim); flex-shrink: 0; }
+        .crib-total { margin-left: auto; font-size: 34px; font-weight: 800; color: var(--accent); line-height: 1; }
+        .crib-total span { font-size: 12px; font-weight: 500; color: var(--text-dim); }
+
+        .crib-quick { display: flex; gap: 6px; flex: 1 1 auto; min-height: 46px; max-height: 170px; }
         .crib-quick-btn {
-            flex: 1; min-width: 36px; padding: 8px 4px;
-            background: var(--surface2); border: none; border-radius: 8px;
-            color: var(--text); font-size: 14px; font-weight: 700; cursor: pointer;
-            transition: background 0.1s;
+            flex: 1; min-width: 0; padding: 0;
+            background: var(--surface2); border: none; border-radius: 12px;
+            color: var(--text); font-size: 22px; font-weight: 800; cursor: pointer;
+            transition: background 0.1s, transform 0.08s;
         }
-        .crib-quick-btn:active { background: var(--primary); }
-        .crib-stepper { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .crib-quick-btn:active { background: var(--primary); transform: scale(0.94); }
+
+        .crib-manual { display: flex; align-items: stretch; gap: 6px; flex: 0 0 auto; height: 44px; }
         .crib-step-btn {
-            width: 34px; height: 34px; border: none; border-radius: 8px;
+            width: 38px; flex: 0 0 38px; border: none; border-radius: 10px;
             background: var(--surface2); color: var(--text);
-            font-size: 20px; font-weight: 700; cursor: pointer; display: flex;
-            align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
         }
-        .crib-custom-input {
-            width: 50px; padding: 6px 4px;
+        .crib-step-btn:active { background: var(--primary); }
+        /* `input` in the selector so this beats the global input[type="text"] width */
+        input.crib-custom-input {
+            width: 56px; flex: 0 0 56px; padding: 0;
             background: var(--surface2); border: 2px solid transparent;
-            border-radius: 8px; color: var(--text);
-            font-size: 16px; font-weight: 700; text-align: center; outline: none;
+            border-radius: 10px; color: var(--text);
+            font-size: 17px; font-weight: 700; text-align: center; outline: none;
         }
-        .crib-custom-input:focus { border-color: var(--primary-light); }
+        input.crib-custom-input:focus { border-color: var(--primary-light); }
         .crib-score-btn {
-            padding: 8px 12px; border: none; border-radius: 8px;
+            flex: 1 1 auto; min-width: 0; border: none; border-radius: 10px;
             background: var(--primary-light); color: #fff;
-            font-size: 14px; font-weight: 700; cursor: pointer;
+            font-size: 15px; font-weight: 700; cursor: pointer;
         }
-        .crib-score-btn:disabled { background: var(--surface2); color: var(--text-dim); cursor: default; }
         .crib-undo-btn {
-            width: 100%; padding: 8px; border: none; border-radius: 8px;
+            width: 44px; flex: 0 0 44px; border: none; border-radius: 10px;
             background: var(--surface2); color: var(--text-dim);
-            font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
         }
         .crib-undo-btn:not([disabled]):active { background: var(--warning); color: #111; }
-        .crib-undo-btn[disabled] { opacity: 0.35; cursor: default; }
+        .crib-undo-btn[disabled] { opacity: 0.3; cursor: default; }
+
+        /* Center strip: zoomed board + minimal controls */
+        .crib-center { flex: 0 0 auto; display: flex; flex-direction: column; gap: 4px; }
+        .crib-board-wrap {
+            background: #152815; border-radius: 12px; overflow: hidden;
+            height: clamp(78px, 19vh, 128px);
+        }
+        .crib-board-wrap svg { display: block; width: 100%; height: 100%; }
+        .crib-center-bar { display: flex; align-items: center; gap: 8px; padding: 0 2px; }
+        .crib-mini-btn {
+            background: var(--surface); border: none; color: var(--text-dim);
+            font-size: 12px; font-weight: 600; padding: 5px 10px;
+            border-radius: 8px; cursor: pointer;
+        }
+        .crib-mini-btn:active { background: var(--surface2); color: var(--text); }
+        .crib-gap-label {
+            flex: 1; text-align: center; font-size: 11px; font-weight: 700;
+            color: var(--text-dim); letter-spacing: 0.5px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        /* Short screens: trim the chrome so both halves stay usable */
+        @media (max-height: 620px) {
+            .crib-total { font-size: 24px; }
+            .crib-quick-btn { font-size: 19px; }
+            .crib-quick { max-height: 110px; }
+            .crib-manual { height: 38px; }
+            .crib-board-wrap { height: clamp(66px, 15vh, 96px); }
+        }
 
         /* ── Toast ── */
         .toast {
@@ -458,16 +496,23 @@
 
 <!-- ── Cribbage ── -->
 <div id="screen-crib" class="screen">
-    <div class="game-top-bar">
-        <button class="back-btn" onclick="confirmBack()">←</button>
-        <span class="game-label">Cribbage</span>
-        <button class="btn btn-sm btn-secondary" onclick="confirmBack()">New Game</button>
+    <!-- Top half — rotated 180° for the player sitting across the table -->
+    <div class="crib-side flipped" id="crib-side-1"></div>
+
+    <div class="crib-center">
+        <div class="crib-board-wrap">
+            <svg id="crib-svg" viewBox="0 0 310 155" preserveAspectRatio="xMidYMid meet"
+                 xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="crib-center-bar">
+            <button class="crib-mini-btn" onclick="confirmBack()">← Home</button>
+            <span class="crib-gap-label" id="crib-gap"></span>
+            <button class="crib-mini-btn" onclick="cribRestart()">Rematch</button>
+        </div>
     </div>
-    <div class="crib-legend" id="crib-legend"></div>
-    <div class="crib-board-wrap">
-        <svg id="crib-svg" viewBox="0 0 310 130" xmlns="http://www.w3.org/2000/svg"></svg>
-    </div>
-    <div class="crib-players" id="crib-players"></div>
+
+    <!-- Bottom half — normal orientation -->
+    <div class="crib-side" id="crib-side-0"></div>
 </div>
 
 <!-- ── Winner ── -->
@@ -555,7 +600,7 @@ let S = {
     rummyData: [],
     rummyOvertime: false,
     rummyOvertimeContenders: [],
-    crib: { animating: false, players: [] },
+    crib: { players: [] },
 };
 
 let histTab = 'games';
@@ -1106,6 +1151,11 @@ const C_PAD_Y = 10;
 const CRIB_WIN_X = 154;
 const CRIB_WIN_Y = 147;
 const CRIB_COLORS = ['#ef4444', '#3b82f6'];
+const CRIB_BOARD_W = 310;
+const CRIB_BOARD_H = 155;
+// Size of the zoomed-in window onto the board (~11 holes wide, ~2 rows tall)
+const CRIB_VIEW_W = 152;
+const CRIB_VIEW_H = 56;
 
 function cribHoleXY(holeNum) {
     const row = Math.floor(holeNum / C_COLS);
@@ -1118,13 +1168,13 @@ function cribHoleXY(holeNum) {
 
 function buildCribSVG() {
     const svg = document.getElementById('crib-svg');
-    svg.setAttribute('viewBox', '0 0 310 155');
 
     // Precompute edge positions
     const xL = C_PAD_X + C_HOLE_R;
     const xR = C_PAD_X + C_HOLE_R + 19 * C_STEP + 3 * C_GROUP_GAP;
 
-    let h = '<rect width="310" height="155" rx="8" fill="#152815"/>';
+    // Backing extends past the board so the zoomed view never shows a gap at the edges
+    let h = '<rect x="-60" y="-60" width="430" height="275" fill="#152815"/>';
 
     // Row connectors — curved arc at each row transition
     for (let r = 0; r < 5; r++) {
@@ -1149,7 +1199,6 @@ function buildCribSVG() {
         const {x, y} = cribHoleXY(hole);
         const score = hole + 1;
         const isFive  = score % 5  === 0;
-        const isTen   = score % 10 === 0;
         const row = Math.floor(hole / C_COLS);
 
         h += `<circle cx="${x}" cy="${y}" r="${C_HOLE_R}"
@@ -1157,10 +1206,11 @@ function buildCribSVG() {
               stroke="${isFive ? '#3d7a3d' : '#1e421e'}"
               stroke-width="${isFive ? '1.3' : '0.8'}"/>`;
 
-        // Score label every 10 holes, placed outside the track
-        if (isTen) {
+        // Score label every 5 holes — the view is zoomed in, so finer labels stay legible
+        if (isFive) {
             const lY = row % 2 === 0 ? y + C_HOLE_R + 6.5 : y - C_HOLE_R - 1.5;
-            h += `<text x="${x}" y="${lY}" text-anchor="middle" font-size="5.5" fill="#5aaa5a" font-weight="bold">${score}</text>`;
+            h += `<text x="${x}" y="${lY}" text-anchor="middle" font-size="5"
+                  fill="${score % 10 === 0 ? '#7fd47f' : '#4d914d'}" font-weight="bold">${score}</text>`;
         }
     }
 
@@ -1208,6 +1258,76 @@ function cribPegPos(score) {
     return cribHoleXY(score - 1);
 }
 
+// ── Zoomed board view ──
+// The board is rendered full-size, but the SVG viewBox is a small window that
+// tracks wherever the pegs currently are, so players see their own stretch of
+// the track instead of all 121 holes at once.
+// `overrides` maps a player index to the {front, back} they are about to hold,
+// so the view can start panning at the same moment the peg starts moving.
+// Front pegs must always be framed; back pegs are included only when they fit
+// without zooming out. If the two front pegs are further apart than the default
+// window, the window grows rather than cutting one of them off.
+function cribViewTarget(overrides) {
+    const PAD_X = 16, PAD_Y = 12;
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const must = [], nice = [];
+
+    S.crib.players.forEach((p, pi) => {
+        const { front, back } = (overrides && overrides[pi]) || p;
+        must.push(cribPegPos(Math.max(1, front)));
+        if (back > 0) nice.push(cribPegPos(back));
+    });
+    if (!must.length) must.push(cribHoleXY(0));
+
+    let minX = Math.min(...must.map(pt => pt.x)) - PAD_X;
+    let maxX = Math.max(...must.map(pt => pt.x)) + PAD_X;
+    let minY = Math.min(...must.map(pt => pt.y)) - PAD_Y;
+    let maxY = Math.max(...must.map(pt => pt.y)) + PAD_Y;
+
+    nice.forEach(pt => {
+        const x0 = Math.min(minX, pt.x - PAD_X), x1 = Math.max(maxX, pt.x + PAD_X);
+        const y0 = Math.min(minY, pt.y - PAD_Y), y1 = Math.max(maxY, pt.y + PAD_Y);
+        if (x1 - x0 <= CRIB_VIEW_W && y1 - y0 <= CRIB_VIEW_H) {
+            minX = x0; maxX = x1; minY = y0; maxY = y1;
+        }
+    });
+
+    const w = clamp(maxX - minX, CRIB_VIEW_W, CRIB_BOARD_W);
+    const h = clamp(maxY - minY, CRIB_VIEW_H, CRIB_BOARD_H);
+    return {
+        x: clamp((minX + maxX) / 2 - w / 2, 0, CRIB_BOARD_W - w),
+        y: clamp((minY + maxY) / 2 - h / 2, 0, CRIB_BOARD_H - h),
+        w, h
+    };
+}
+
+function applyCribView(v) {
+    S.crib.view = v;
+    const svg = document.getElementById('crib-svg');
+    if (svg) svg.setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`);
+}
+
+function setCribView(target, animate) {
+    const from = S.crib.view;
+    if (!animate || !from) { applyCribView(target); return; }
+    if (S.crib.viewTimer) { clearTimeout(S.crib.viewTimer); S.crib.viewTimer = null; }
+
+    const duration = 380;
+    const start = Date.now();
+    (function step() {
+        const t = Math.min(1, (Date.now() - start) / duration);
+        const ease = 1 - Math.pow(1 - t, 3);
+        applyCribView({
+            x: from.x + (target.x - from.x) * ease,
+            y: from.y + (target.y - from.y) * ease,
+            w: from.w + (target.w - from.w) * ease,
+            h: from.h + (target.h - from.h) * ease
+        });
+        if (t < 1) S.crib.viewTimer = setTimeout(step, 16);
+        else S.crib.viewTimer = null;
+    })();
+}
+
 function placePegs() {
     S.crib.players.forEach((p, pi) => {
         const fEl = document.getElementById(`cpeg-${pi}-f`);
@@ -1240,7 +1360,7 @@ function animateCribPeg(pi, fromScore, toScore, cb) {
     const offset = pi === 0 ? -2.5 : 2.5;
     const fromPos = fromScore > 0 ? cribPegPos(fromScore) : cribPegPos(toScore);
     const toPos = cribPegPos(toScore);
-    const duration = 500;
+    const duration = 380;
     const start = Date.now();
     el.style.display = '';
 
@@ -1259,82 +1379,119 @@ function animateCribPeg(pi, fromScore, toScore, cb) {
 
 function initCrib() {
     S.crib = {
-        animating: false,
-        players: S.players.slice(0, 2).map(name => ({ name, front: 0, back: 0, history: [] }))
+        view: null,
+        viewTimer: null,
+        custom: [1, 1],
+        players: S.players.slice(0, 2).map(name => ({ name, front: 0, back: 0, history: [], busy: false, queue: [] }))
     };
     buildCribSVG();
     placePegs();
+    setCribView(cribViewTarget(), false);
     renderCrib();
     showScreen('crib');
 }
 
+// Reset the board without going back through player setup
+function cribRestart() {
+    if (S.crib.players.some(p => p.busy)) return;
+    if (!confirm('Start a new game with the same players?')) return;
+    initCrib();
+    toast('New game');
+}
+
 function undoCribScore(pi) {
-    if (S.crib.animating) return;
     const p = S.crib.players[pi];
+    if (p.busy) return;
     if (!p.history.length) { toast('Nothing to undo'); return; }
     const prev = p.history.pop();
     p.front = prev.front;
     p.back  = prev.back;
     placePegs();
+    setCribView(cribViewTarget(), true);
     renderCrib();
 }
 
-function renderCrib() {
-    // Legend
-    document.getElementById('crib-legend').innerHTML = S.crib.players.map((p, i) =>
-        `<div class="crib-legend-item">
-            <div class="crib-legend-dot" style="background:${CRIB_COLORS[i]}"></div>
-            <span>${p.name}</span>
-        </div>`
-    ).join('');
+// Quick-score presets — the hands you actually peg most often
+const CRIB_QUICK = [1, 2, 3, 4, 8];
 
-    // Player cards
-    document.getElementById('crib-players').innerHTML = S.crib.players.map((p, pi) => `
-        <div class="crib-player-card p${pi}-card">
-            <div class="crib-player-top">
-                <span class="crib-player-name" style="color:${CRIB_COLORS[pi]}">${p.name}</span>
-                <span class="crib-player-score">${p.front} <span style="font-size:13px;color:var(--text-dim);font-weight:500">/ 121</span></span>
+function renderCrib() {
+    // Either half can re-render while the other player is typing a manual score
+    const focused = document.activeElement;
+    const focusedId = focused && focused.classList.contains('crib-custom-input') ? focused.id : null;
+
+    S.crib.players.forEach((p, pi) => {
+        const el = document.getElementById(`crib-side-${pi}`);
+        if (!el) return;
+        el.style.setProperty('--pc', CRIB_COLORS[pi]);
+
+        const other = S.crib.players[1 - pi];
+        const diff = other ? p.front - other.front : 0;
+        const lead = diff > 0 ? `+${diff}` : diff < 0 ? `${diff}` : '—';
+
+        el.innerHTML = `
+            <div class="crib-head">
+                <span class="crib-dot"></span>
+                <span class="crib-name">${p.name}</span>
+                <span class="crib-lead">${lead}</span>
+                <span class="crib-total">${p.front}<span> / 121</span></span>
             </div>
-            <div class="crib-score-row">
-                <div class="crib-quick-btns">
-                    ${[1,2,3,4,5,6,7,8].map(n =>
-                        `<button class="crib-quick-btn" onclick="cribScore(${pi},${n})">${n}</button>`
-                    ).join('')}
-                </div>
+            <div class="crib-quick">
+                ${CRIB_QUICK.map(n =>
+                    `<button class="crib-quick-btn" onclick="cribScore(${pi},${n})">${n}</button>`
+                ).join('')}
             </div>
-            <div class="crib-score-row" style="margin-top:8px">
+            <div class="crib-manual">
                 <button class="crib-step-btn" onclick="cribStepCustom(${pi},-1)">−</button>
                 <input type="text" inputmode="numeric" pattern="[0-9]*" class="crib-custom-input"
-                    id="crib-custom-${pi}" value="1" />
+                    id="crib-custom-${pi}" value="${S.crib.custom[pi]}"
+                    oninput="S.crib.custom[${pi}] = this.value" />
                 <button class="crib-step-btn" onclick="cribStepCustom(${pi},1)">+</button>
-                <button class="crib-score-btn" style="flex-shrink:0"
-                    onclick="cribScoreCustom(${pi})" ${S.crib.animating ? 'disabled' : ''}>Score</button>
-            </div>
-            <button class="crib-undo-btn" onclick="undoCribScore(${pi})" ${p.history.length === 0 ? 'disabled' : ''}>↩ Undo Last Score</button>
-        </div>`
-    ).join('');
+                <button class="crib-score-btn" onclick="cribScoreCustom(${pi})">Score</button>
+                <button class="crib-undo-btn" onclick="undoCribScore(${pi})"
+                    title="Undo last score" ${p.busy || p.history.length === 0 ? 'disabled' : ''}>↩</button>
+            </div>`;
+    });
+
+    // Center strip — who's ahead, and by how much
+    const [a, b] = S.crib.players;
+    const gapEl = document.getElementById('crib-gap');
+    if (gapEl && a && b) {
+        const d = Math.abs(a.front - b.front);
+        gapEl.textContent = d === 0 ? 'ALL SQUARE'
+            : `${(a.front > b.front ? a : b).name.toUpperCase()} +${d}`;
+    }
+
+    if (focusedId) restoreFocus(focusedId);
 }
 
 function cribStepCustom(pi, delta) {
     const el = document.getElementById(`crib-custom-${pi}`);
-    const cur = parseInt(el.value) || 1;
-    el.value = Math.max(1, cur + delta);
+    const next = Math.max(1, (parseInt(el.value) || 1) + delta);
+    el.value = next;
+    S.crib.custom[pi] = next;
 }
 
 function cribScoreCustom(pi) {
     const el = document.getElementById(`crib-custom-${pi}`);
     const pts = Math.max(1, parseInt(el.value) || 1);
+    S.crib.custom[pi] = 1;
+    el.blur();
     cribScore(pi, pts);
 }
 
 function cribScore(pi, pts) {
-    if (S.crib.animating) return;
-    S.crib.animating = true;
-
     const p = S.crib.players[pi];
+    // Lock is per player — the other half of the screen stays live. Taps that land
+    // mid-animation are queued rather than dropped, so fast pegging never loses points.
+    if (p.busy) { p.queue.push(pts); return; }
+    p.busy = true;
     p.history.push({ front: p.front, back: p.back });
     const fromFront = p.front;
     const newScore = Math.min(CRIB_WIN, p.front + pts);
+
+    renderCrib();   // reflect the new busy state (undo is held while the peg moves)
+    // Pan the zoomed view along with the peg (old front becomes the new back peg)
+    setCribView(cribViewTarget({ [pi]: { front: newScore, back: fromFront } }), true);
 
     // Animate back peg from its old position to new score
     animateCribPeg(pi, fromFront, newScore, () => {
@@ -1370,11 +1527,14 @@ function cribScore(pi, pts) {
         bEl.id = `cpeg-${pi}-f`;
         fEl.id = `cpeg-${pi}-b`;
 
-        S.crib.animating = false;
+        p.busy = false;
         renderCrib();
 
         if (p.front >= CRIB_WIN) {
+            p.queue.length = 0;
             setTimeout(() => showCribWinner(), 300);
+        } else if (p.queue.length) {
+            cribScore(pi, p.queue.shift());
         }
     });
 }
